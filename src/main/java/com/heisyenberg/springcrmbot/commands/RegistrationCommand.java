@@ -1,5 +1,6 @@
 package com.heisyenberg.springcrmbot.commands;
 
+import com.heisyenberg.springcrmbot.bot.Keyboards;
 import com.heisyenberg.springcrmbot.models.ChatState;
 import com.heisyenberg.springcrmbot.models.Company;
 import com.heisyenberg.springcrmbot.services.CompaniesService;
@@ -9,13 +10,13 @@ import java.util.Map;
 import java.util.Optional;
 
 public class RegistrationCommand implements BotCommand {
-    private final CompaniesService companiesService;
-    private final Map<Long, Company> companies;
     private final Map<Long, ChatState> chatStates;
+    private final Map<Long, Company> companies;
+    private final CompaniesService companiesService;
 
-    public RegistrationCommand(CompaniesService companiesService,
+    public RegistrationCommand(Map<Long, ChatState> chatStates,
                                Map<Long, Company> companies,
-                               Map<Long, ChatState> chatStates) {
+                               CompaniesService companiesService) {
         this.companiesService = companiesService;
         this.companies = companies;
         this.chatStates = chatStates;
@@ -23,7 +24,7 @@ public class RegistrationCommand implements BotCommand {
 
     @Override
     public SendMessage handleUpdate(Long chatId, String updateMessage) {
-        String[] data = updateMessage.split(" ");
+        String[] data = updateMessage.split("[\\s\\n]+");
         SendMessage sendMessage = new SendMessage();
         sendMessage.setChatId(chatId);
         if (data.length != 3) {
@@ -36,8 +37,9 @@ public class RegistrationCommand implements BotCommand {
             companies.put(chatId, company.get());
             chatStates.put(chatId, ChatState.LOGGED_IN);
             sendMessage.setChatId(chatId);
-            sendMessage.setText("You successfully registered and logged in "
-                    + company.get().getName() + " company account");
+            sendMessage.setText("You successfully registered and logged in to" +
+                    " \"" + company.get().getName() + "\" company account");
+            sendMessage.setReplyMarkup(Keyboards.loggedInKeyboard());
         } else {
             sendMessage.setText("Unable to register company");
         }

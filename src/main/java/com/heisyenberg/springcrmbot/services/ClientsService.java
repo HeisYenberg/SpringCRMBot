@@ -4,6 +4,7 @@ import com.heisyenberg.springcrmbot.models.Client;
 import com.heisyenberg.springcrmbot.models.Company;
 import com.heisyenberg.springcrmbot.repositories.ClientsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.Constants;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,8 +18,17 @@ public class ClientsService {
         this.clientsRepository = clientsRepository;
     }
 
-    public void addClient(Client client) {
-        clientsRepository.save(client);
+    public boolean addClient(Client client) {
+        try {
+            if (clientsRepository.existsByCompanyAndEmail(
+                    client.getCompany(), client.getEmail())) {
+                return false;
+            }
+            clientsRepository.save(client);
+        } catch (Constants.ConstantException e) {
+            return false;
+        }
+        return true;
     }
 
     public List<Client> getAllByCompany(Company company) {

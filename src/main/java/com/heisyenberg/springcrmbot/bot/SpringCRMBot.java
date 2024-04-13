@@ -3,7 +3,9 @@ package com.heisyenberg.springcrmbot.bot;
 import com.heisyenberg.springcrmbot.commands.*;
 import com.heisyenberg.springcrmbot.models.ChatState;
 import com.heisyenberg.springcrmbot.models.Company;
+import com.heisyenberg.springcrmbot.services.ClientsService;
 import com.heisyenberg.springcrmbot.services.CompaniesService;
+import com.heisyenberg.springcrmbot.services.ProductsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -23,17 +25,23 @@ public class SpringCRMBot extends TelegramLongPollingBot {
     private final Map<Long, ChatState> chatStates;
     private final Map<Long, Company> companies;
     private final CompaniesService companiesService;
+    private final ClientsService clientsService;
+    private final ProductsService productsService;
     private final List<BotCommand> botCommands;
 
     @Autowired
     SpringCRMBot(@Value("${bot.token}") String botToken,
                  @Value("${bot.name}") String botName,
-                 CompaniesService companiesService) {
+                 CompaniesService companiesService,
+                 ClientsService clientsService,
+                 ProductsService productsService) {
         super(botToken);
         this.botName = botName;
         chatStates = new HashMap<>();
         companies = new HashMap<>();
         this.companiesService = companiesService;
+        this.clientsService = clientsService;
+        this.productsService = productsService;
         this.botCommands = getBotCommands();
     }
 
@@ -52,9 +60,9 @@ public class SpringCRMBot extends TelegramLongPollingBot {
         if (updateMessage.equals("/start") || !chatStates.containsKey(chatId)) {
             chatStates.put(chatId, ChatState.START);
         }
-        SendMessage sendMessage =
-                botCommands.get(chatStates.get(chatId).ordinal())
-                        .handleUpdate(chatId, updateMessage);
+        SendMessage sendMessage = botCommands.
+                get(chatStates.get(chatId).ordinal())
+                .handleUpdate(chatId, updateMessage);
         try {
             execute(sendMessage);
         } catch (TelegramApiException e) {
@@ -67,9 +75,15 @@ public class SpringCRMBot extends TelegramLongPollingBot {
         botCommands.add(new StartCommand(chatStates));
         botCommands.add(new AwaitingAuthenticationCommand(chatStates));
         botCommands.add(new LoginCommand(
-                companiesService, companies, chatStates));
+                chatStates, companies, companiesService));
         botCommands.add(new RegistrationCommand(
-                companiesService, companies, chatStates));
+                chatStates, companies, companiesService));
+        botCommands.add(new LoggedInCommand(
+                chatStates, companies, clientsService, productsService));
+        botCommands.add(new AddClientCommand(
+                chatStates, companies, clientsService));
+        botCommands.add(new AddProductCommand(
+                chatStates, companies, productsService));
         return botCommands;
     }
 }

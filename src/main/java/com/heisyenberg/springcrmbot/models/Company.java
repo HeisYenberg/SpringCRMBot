@@ -3,6 +3,7 @@ package com.heisyenberg.springcrmbot.models;
 import lombok.*;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
 
 @Entity(name = "companies")
 @NoArgsConstructor
@@ -17,6 +18,7 @@ public class Company {
     private Long id;
     @Column(nullable = false)
     private String name;
+    @Email
     @Column(nullable = false, unique = true)
     private String email;
     @Column(nullable = false)
