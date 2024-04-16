@@ -9,8 +9,6 @@ information within a CRM system, all through Telegram.
   commands, providing a structured way for users to interact with the CRM
   system. Commands include:
 - `/start`: Initiates the bot and provides an overview of available commands.
-- `/authentication`: Authenticates the user to access the CRM bot
-  functionalities.
 - `/login`: Logs the user into the CRM system.
 - `/registration`: Registers a new user in the CRM system.
 - `/logged_in`: Checks if the user is logged in.
