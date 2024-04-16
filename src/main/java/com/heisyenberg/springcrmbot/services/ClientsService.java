@@ -8,6 +8,7 @@ import org.springframework.core.Constants;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ClientsService {
@@ -32,6 +33,10 @@ public class ClientsService {
     }
 
     public List<Client> getAllByCompany(Company company) {
-        return clientsRepository.findByCompany(company);
+        return clientsRepository.findAllByCompany(company);
+    }
+
+    public Optional<Client> getClientByEmail(Company company, String email) {
+        return clientsRepository.findByCompanyAndEmail(company, email);
     }
 }

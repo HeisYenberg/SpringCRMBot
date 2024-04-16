@@ -31,8 +31,7 @@ public class Client {
 
     @Override
     public String toString() {
-        return new StringJoiner(" ")
-                .add(id.toString() + ')')
+        return new StringJoiner(", ")
                 .add(firstName)
                 .add(lastName)
                 .add(email)

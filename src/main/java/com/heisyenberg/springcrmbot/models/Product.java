@@ -16,7 +16,11 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false)
+    private String vendorCode;
+    @Column(nullable = false)
     private String name;
+    @Column(nullable = false)
+    private Double price;
     @Column(nullable = false)
     private String description;
     @ManyToOne
@@ -25,9 +29,10 @@ public class Product {
 
     @Override
     public String toString() {
-        return new StringJoiner(" ")
-                .add(id.toString() + ')')
+        return new StringJoiner(", ")
+                .add(vendorCode)
                 .add(name)
+                .add(price.toString())
                 .add(description)
                 .toString();
     }

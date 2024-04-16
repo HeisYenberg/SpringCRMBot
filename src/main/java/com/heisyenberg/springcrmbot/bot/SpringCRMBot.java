@@ -6,6 +6,7 @@ import com.heisyenberg.springcrmbot.models.Company;
 import com.heisyenberg.springcrmbot.services.ClientsService;
 import com.heisyenberg.springcrmbot.services.CompaniesService;
 import com.heisyenberg.springcrmbot.services.ProductsService;
+import com.heisyenberg.springcrmbot.services.SalesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -27,6 +28,7 @@ public class SpringCRMBot extends TelegramLongPollingBot {
     private final CompaniesService companiesService;
     private final ClientsService clientsService;
     private final ProductsService productsService;
+    private final SalesService salesService;
     private final List<BotCommand> botCommands;
 
     @Autowired
@@ -34,7 +36,7 @@ public class SpringCRMBot extends TelegramLongPollingBot {
                  @Value("${bot.name}") String botName,
                  CompaniesService companiesService,
                  ClientsService clientsService,
-                 ProductsService productsService) {
+                 ProductsService productsService, SalesService salesService) {
         super(botToken);
         this.botName = botName;
         chatStates = new HashMap<>();
@@ -42,6 +44,7 @@ public class SpringCRMBot extends TelegramLongPollingBot {
         this.companiesService = companiesService;
         this.clientsService = clientsService;
         this.productsService = productsService;
+        this.salesService = salesService;
         this.botCommands = getBotCommands();
     }
 
@@ -73,17 +76,27 @@ public class SpringCRMBot extends TelegramLongPollingBot {
     private List<BotCommand> getBotCommands() {
         List<BotCommand> botCommands = new ArrayList<>();
         botCommands.add(new StartCommand(chatStates));
-        botCommands.add(new AwaitingAuthenticationCommand(chatStates));
+        botCommands.add(new AuthenticationCommand(chatStates));
         botCommands.add(new LoginCommand(
                 chatStates, companies, companiesService));
         botCommands.add(new RegistrationCommand(
                 chatStates, companies, companiesService));
-        botCommands.add(new LoggedInCommand(
-                chatStates, companies, clientsService, productsService));
+        botCommands.add(new LoggedInCommand(chatStates, companies,
+                clientsService, productsService, salesService, this));
         botCommands.add(new AddClientCommand(
+                chatStates, companies, clientsService));
+        botCommands.add(new GetClientCommand(
                 chatStates, companies, clientsService));
         botCommands.add(new AddProductCommand(
                 chatStates, companies, productsService));
+        botCommands.add(new GetProductCommand(
+                chatStates, companies, productsService));
+        botCommands.add(new AddSaleCommand(
+                chatStates, companies, salesService));
+        botCommands.add(new GetClientSalesCommand(
+                chatStates, companies, salesService, this));
+        botCommands.add(new GetClientSalesCommand(
+                chatStates, companies, salesService, this));
         return botCommands;
     }
 }

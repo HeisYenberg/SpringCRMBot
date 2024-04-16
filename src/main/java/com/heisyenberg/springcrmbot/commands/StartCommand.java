@@ -19,7 +19,7 @@ public class StartCommand implements BotCommand {
                 "Please login or register to your company account.";
         SendMessage sendMessage = new SendMessage(chatId.toString(), message);
         sendMessage.setReplyMarkup(Keyboards.authorizationKeyboard());
-        chatStates.put(chatId, ChatState.AWAITING_AUTHENTICATION);
+        chatStates.put(chatId, ChatState.AUTHENTICATION);
         return sendMessage;
     }
 }
